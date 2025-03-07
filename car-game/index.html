@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2d Car Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background: lightgray;
+            display: block;
+            margin: 20px auto;
+            border: 2px solid black;
+            position: relative;
+        }
+        .score {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .control-button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: lightblue;
+            color: black;
+            border: none;
+            border-radius: 5px;
+        }
+        .control-button:active {
+            background-color: lightblue;
+        }
+        .close-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .legend {
+            margin-top: 15px;
+            font-size: 14px;
+            color: gray;
+        }
+        .restart-box, .win-box {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: green;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .win-box {
+            background-color: pink;
+            color: black;
+            font-size: 16px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="score">Score: <span id="score">0000</span></div>
+    <div style="position: relative; display: inline-block;">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="restart-box" id="restartBox" onclick="restartGame()">?? Restart ??</div>
+        <div class="win-box" id="winBox">Congratulations!! You missed all your crush hints<br><br>Better luck next time :D</div>
+    </div>
+    <div class="controls">
+        <button class="control-button" onclick="moveLeft()">⬅ Left</button>
+        <button class="control-button" onclick="moveRight()">➡ Right</button>
+    </div>
+    <button class="close-button" onclick="closeGame()">Close Game</button>
+    <div class="legend">
+        <p>🟧 = Your Car | ⚫ = Obstacle | ⭐ = Point Boost (+50)</p>
+        <p>🟩 Going On Grass = -10 points | ⬅️ ➡️ for Movement</p>
+        <p><strong>Reach absolute 0 or 9999 for a suprise</strong></p>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("score");
+        const restartBox = document.getElementById("restartBox");
+        const winBox = document.getElementById("winBox");
+
+        const gridSize = 12;
+        const cellSize = canvas.width / gridSize;
+        let carPosition = Math.floor(gridSize / 2);
+        let obstacles = [];
+        let stars = [];
+        let score = 0;
+        let gameRunning = true;
+        let speed = 800;
+
+        const grassColors = ["#228B22", "#32CD32"]; // Dark Green, Light Green
+        function drawBackground() {
+            for (let x = 0; x < gridSize; x++) {
+                for (let y = 0; y < gridSize; y++) {
+                    if (x === 0 || x === gridSize - 1) {
+                        ctx.fillStyle = grassColors[Math.floor(Math.random() * grassColors.length)];
+                    } else {
+                        ctx.fillStyle = "lightgray"; // Default road background
+                    }
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                }
+            }
+        }
+
+        function drawCar() {
+            ctx.fillStyle = "orange";
+            ctx.fillRect(carPosition * cellSize, canvas.height - cellSize * 2, cellSize, cellSize * 2);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = "rgb(101, 101, 101)";
+            obstacles.forEach(obs => {
+                ctx.beginPath();
+                ctx.arc(obs.x * cellSize + cellSize / 2, obs.y * cellSize + cellSize / 2, cellSize / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawStars() {
+            ctx.fillStyle = "gold";
+            stars.forEach(star => {
+            const centerX = star.x * cellSize + cellSize / 2;
+            const centerY = star.y * cellSize + cellSize / 2;
+            const size = cellSize / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - size); // Top point
+            ctx.lineTo(centerX - size, centerY + size); // Bottom left
+            ctx.lineTo(centerX + size, centerY + size); // Bottom right
+            ctx.closePath();
+            ctx.fill();
+            });
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawCar();
+            drawObstacles();
+            drawStars();
+            obstacles.forEach(obs => obs.y++);
+            stars.forEach(star => star.y++);
+            obstacles = obstacles.filter(obs => obs.y * cellSize < canvas.height);
+            stars = stars.filter(star => star.y * cellSize < canvas.height);
+            
+            if (Math.random() < 0.5) {
+                obstacles.push({ x: Math.floor(Math.random() * (gridSize))+1, y: 0 });
+            }
+            if (Math.random() < 0.05) {
+                stars.push({ x: Math.floor(Math.random() * (gridSize-2))+1, y: 0 });
+            }
+            
+            stars.forEach((star, index) => {
+                if (star.x === carPosition && star.y * cellSize >= canvas.height - cellSize * 2) {
+                    score = Math.min(score + 50, 9999);
+                    stars.splice(index, 1);
+                }
+            });
+
+            obstacles.forEach(obs => {
+                if (obs.x === carPosition && obs.y * cellSize >= canvas.height - cellSize * 2) {
+                    gameRunning = false;
+                    restartBox.style.display = "block";
+                }
+            });
+            
+            if (score >= 9999) {
+                gameRunning = false;
+                winBox.style.display = "block";
+            }
+            
+            if (gameRunning) {
+                score = Math.min(score + 1, 9999);
+                scoreDisplay.textContent = score.toString().padStart(4, '0');
+                setTimeout(updateGame, 250);
+            }
+        }
+
+        function moveLeft() {
+            if (carPosition > 0) {
+                carPosition--;
+                if (carPosition === 0 || carPosition === gridSize - 1) {
+                    applyPenalty();
+                }
+            }
+        }
+
+        function moveRight() {
+            if (carPosition < gridSize - 1) {
+                carPosition++;
+                if (carPosition === 0 || carPosition === gridSize - 1) {
+                    applyPenalty();
+                }
+            }
+        }
+
+        function applyPenalty() {
+            score = Math.max(score - 10, 0); // Prevents going below -100
+            scoreDisplay.textContent = score.toString().padStart(4, '0');
+
+            if (score <= 0) {
+                gameRunning = false;
+                showSingleBox();
+            }
+        }
+
+        function showSingleBox() {
+            let singleBox = document.createElement("div");
+            singleBox.id = "singleBoxMessage"; 
+            singleBox = document.createElement("div");
+            singleBox.textContent = "No wonder still single. You're moving backward -- Press to Restart --";
+            singleBox.style.position = "absolute";
+            singleBox.style.top = "50%";
+            singleBox.style.left = "50%";
+            singleBox.style.transform = "translate(-50%, -50%)";
+            singleBox.style.backgroundColor = "pink";
+            singleBox.style.color = "black";
+            singleBox.style.padding = "20px";
+            singleBox.style.fontSize = "16px";
+            singleBox.style.borderRadius = "10px";
+            singleBox.style.cursor = "pointer";
+            singleBox.onclick = restartGame;
+
+            // When the box is clicked, remove it and restart the game
+            singleBox.onclick = function () {
+                document.body.removeChild(singleBox); // Remove the box
+                restartGame(); // Restart the game
+            };
+            document.body.appendChild(singleBox);
+        }
+    
+        function restartGame() {
+            score = 0;
+            scoreDisplay.textContent = "0000";
+            carPosition = Math.floor(gridSize / 2);
+            obstacles = [];
+            stars = [];
+            gameRunning = true;
+            restartBox.style.display = "none";
+            winBox.style.display = "none";
+            updateGame();
+        }
+    
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") moveLeft();
+            if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") moveRight();
+        });
+        updateGame();
+
+        function closeGame() {
+            window.close(); // Close the current tab
+        }
+
+    </script>
+</body>
+</html>

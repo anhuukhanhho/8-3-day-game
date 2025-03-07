@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8/3 Day Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('images/background4.png'); /* Replace with your actual image file */
+            background-size: cover; /* Ensures the image covers the entire screen */
+            background-position: center; /* Centers the image */
+            background-repeat: no-repeat; /* Prevents repeating */
+            margin: 0;
+            flex-direction: column;
+            position: relative;
+        }
+        .menu, .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+            align-items: center;
+        }
+        .menu-item {
+            padding: 20px;
+            color: black;
+            text-decoration: none;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transform: scale(1);
+        }
+        .menu-item:hover, .menu-item:active, .grid-item:hover, .grid-item:active {
+            transform: scale(1.1);
+            text-decoration: underline;
+        }
+        .learn {
+            background-color: lightblue;
+        }
+        .learn:hover {
+            background-color: #3c9cd8;
+        }
+        .minigame {
+            background-color: rgb(253, 144, 160);
+        }
+        .minigame:hover {
+            background-color: #ffb6c1;
+        }
+        .submenu {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .submenu .menu-item {
+            width: 230px;
+        }
+        .purple { background-color: #6a0dad; color: white; }
+        .purple:hover { background-color: #4a087d; }
+        .green { background-color: #28a745; color: white; }
+        .green:hover { background-color: #1e7e34; }
+        .gold { background-color: #f8c92c; color: white; }
+        .gold:hover { background-color: #ffcc24; }
+        .hidden { display: none; }
+        .return-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background-color: rgb(82, 82, 82);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+        }
+        .nickname-box {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            flex-direction: column; /* Stack items in a column */
+            align-items: center; /* Center them horizontally */
+            gap: 10px; /* Adds space between logo and input */
+        }
+        .logo {
+            width: 300px; /* Adjust size as needed */
+            height: auto;
+            margin-bottom: 3px; /* Space between logo and input */
+        }
+        .nickname-box input {
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 250px;
+            text-align: center;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, auto); /* 3 rows, height adjusts based on content */
+            gap: 10px;
+            margin-top: 10px;
+            max-width: 600px;
+        }
+        .grid-item {
+            word-wrap: break-word;  /* Allows text to break */
+            text-align: center;  /* Keeps text centered */
+            width: 130px;
+            height: 100px;
+            background-color: rgb(132, 206, 231);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-style: italic;
+            border-radius: 10px;
+            transition: 0.3s;
+            transform: scale(1);
+            padding: 5px; /* Adds some spacing inside the box */
+        }
+
+        .popup-box {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: justify;
+            z-index: 1000;
+        }
+
+        .popup-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .video {
+            background-color: #ffcc00; /* Yellow background */
+        }
+        .video:hover {
+            background-color: #e6b800; /* Darker yellow on hover */
+        }
+
+        .credits {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            font-size: 15px;
+            color: rgb(121, 120, 120);
+            line-height: 1.5; /* Adds spacing between lines */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="nickname-box">
+        <img src="images/your-logo.png" alt="Logo" class="logo">
+        <input type="text" id="nickname" placeholder="Enter your nickname...">
+    </div>
+    
+    <div class="menu" id="mainMenu">
+        <div class="menu-item learn" onclick="showContent('content1')">International Women's Day</div>
+        <div class="menu-item minigame" onclick="showContent('content2')">💐 Minigame with Crush 🥰</div>
+        <div class="menu-item video" onclick="openVideo()">📚 Study with Me? 📺</div>
+    </div>
+    
+    <div class="content hidden" id="content1">
+        <div class="grid-container">
+            <div class="grid-item">When It All Began</div>
+            <div class="grid-item">The Leading Women</div>
+            <div class="grid-item">Going International</div>
+            <div class="grid-item"><strong>The First Programmer</strong></div>
+            <div class="grid-item"><strong>La Pucelle d'Orléans</strong></div>
+            <div class="grid-item"><strong>The Mother of Physics</strong></div>
+            <div class="grid-item"><strong>The Lady With the Lamp</strong></div>
+            <div class="grid-item"><strong>Die "Mutti" Kanzlerin</strong></div>
+            <div class="grid-item"><strong>Sương Nguyệt Ánh</strong></div>
+            <div class="grid-item">Flower, Food & Cuddles</div>
+            <div class="grid-item">Embracing Women's Day</div>
+            <div class="grid-item">Celebrate With Us At VGU</div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup-box" id="popupBox">
+    <p id="popupContent">This is a placeholder text.</p>
+    </div>
+    
+    <div class="content hidden" id="content2">
+        <div class="submenu" style="display: flex; flex-direction: column; gap: 15px;">
+            <a href="http://gskinner.com/playpen/AdobeAnimateDemo/bubblecano/index.html" target="_blank" class="menu-item purple">🦖 Bubblecano 🌋</a>
+            <a href="car-game/index.html" target="_blank" class="menu-item green">🏁 2D Car Game 🏁</a>
+            <a href="https://g.co/kgs/Jhdk8rn" target="_blank" class="menu-item gold">🏅 Champion Island 🏅</a>
+        </div>
+    </div>
+    
+    <div class="return-button" id="returnButton" onclick="goBack()">⬅ Back</div>
+    
+    <div class="credits">Build version 0.0.0.8 (7/3/25)<br>Powered by 69 cans of Redbull & Matcha Lattes<br>Made by @gia_phuthanh.ch & @_pandoras_kana.ig</div>    
+
+    <script>
+        function showContent(contentId) {
+            document.getElementById('mainMenu').classList.add('hidden');
+            document.getElementById(contentId).classList.remove('hidden');
+            document.getElementById('returnButton').style.display = 'block';
+        }
+        
+        function goBack() {
+            document.getElementById('mainMenu').classList.remove('hidden');
+            document.getElementById('content1').classList.add('hidden');
+            document.getElementById('content2').classList.add('hidden');
+            document.getElementById('returnButton').style.display = 'none';
+        }
+
+        function openVideo() {
+            window.open('https://www.youtube.com/watch?v=YdtBEFK_HgI', '_blank');
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const nicknameInput = document.getElementById("nickname");
+
+        // Load saved nickname from localStorage
+            if (localStorage.getItem("nickname")) {
+                nicknameInput.value = localStorage.getItem("nickname");
+        }
+
+        // Save nickname whenever the user types
+            nicknameInput.addEventListener("input", function () {
+                localStorage.setItem("nickname", nicknameInput.value);
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const gridItems = document.querySelectorAll(".grid-item");
+        const popupBox = document.getElementById("popupBox");
+        const popupContent = document.getElementById("popupContent");
+        const popupOverlay = document.getElementById("popupOverlay");
+
+        // Store content for each grid item
+        const contentMap = {
+            "When It All Began": { text: "Every year on March 8th, we celebrate International Women’s Day, a day to honor strength and achievement of women. 🌎But where did it all start?🤔<br><br>Back in 1909, the first National Women’s Day was observed in the U.S., inspired by garment workers fighting for better conditions. A year later, at a conference in Copenhagen, the idea of an annual Women’s Day took off, and by 1911, over a million people across Europe joined in. 🎉 Fast forward to 1917, women in Russia led protests that changed history, and by 1975, the United Nations made it official.", color: "#98FB98" }, // Pale Green
+            "The Leading Women": { text: "International Women’s Day wouldn’t be what it is today without the bold and fearless women who fought for it! ✊ One of the key figures was Theresa Malkiel, a former garment worker in the U.S. who helped organize the first National Women’s Day in 1909 to support striking workers.<br><br>👩‍🏭But it didn’t stop there! At an international conference in 1910, German activist Clara Zetkin took things global, she proposed a yearly Women’s Day to demand equality and voting rights. 🗳️ Women across Europe embraced the idea, and by 1911, the first International Women’s Day was celebrated in several countries. 🎉", color: "#f6c4fb" }, // Light Purple
+            "Going International": { text: "What started as a local movement soon took the world by storm! 🚀 After the first National Women’s Day was celebrated in 1909, German activist Clara Zetkin saw an even bigger vision for an annual day where women everywhere could unite for their rights. At the 1910 International Socialist Women’s Conference, she proposed the idea and over 100 women from 17 nations supported it! 🌎 By 1911, the first official International Women’s Day was celebrated in Austria, Denmark, Germany & Switzerland.<br><br>🎉The movement only grew from there and in 1975, the Unite Nations officially recognized 8/3 as the day to celebrate women's achievements and fight for equality.", color: "#d7d7d7" }, // silver
+            "The First Programmer": { text: "Long before computers became a reality, Ada Lovelace saw their potential! —  In the 1800s, she worked alongside mathematician Charles Babbage on his design for the Analytical Engine, an early mechanical computer. 🖥️ But Ada didn’t just study the machine, she wrote the first-ever algorithm designed to be processed by a computer, making her the world’s first programmer!<br><br>👩‍💻🚀Her visionary ideas went beyond as she imagined computers creating music and art, ideas that became reality over a century later. 🎶 Today, Ada’s legacy continues to inspire programmers and innovators around the world. 🎨", color: "#ADD8E6" }, // Light Blue
+            "La Pucelle d'Orléans": { text: "A fearless warrior and a symbol of courage, Joan of Arc,  La Pucelle d'Orléans (The Maid of Orléans), changed the course of French history. At just 17, she led French troops to victory against the English during the Hundred Years War, claiming divine guidance in her mission. ⚔️ Her bravery turned the tide, helping to crown Charles VII as King of France. 👑But her triumph was short-lived. Captured and accused of heresy, she was tragically burned at the stake in 1431. 🔥Yet, her legacy endured and centuries later, she was canonized as a saint in 1920. Today, Joan remains an icon of faith, resilience, and fearless leadership. 🏆", color: "#FFB6C1" }, // Light Pink
+            "The Mother of Physics": { text: "🔬A true pioneer, Marie Curie shattered barriers in science and became the first woman to win a Nobel Prize and the only to win in two different scientific fields! ⚛️Her groundbreaking work on radioactivity (a term she coined) led to the discovery of polonium and radium, revolutionizing medicine and physics.<br><br>🔬Despite facing immense challenges as a woman in science, she remained dedicated to her research, even developing mobile X-ray units that helped soldiers during the first World War.🚑Her legacy continues to inspire worldwide, proving curiosity and perseverance can change the world.💡", color: "#98FB98" }, // Pale Green
+            "The Lady With the Lamp": { text: "Florence Nightingale dedicated her life to saving others. 🏥During the Crimean War (1853–1856), she and her nurses team transformed filthy, overcrowded hospitals into clean, efficient care centers, reducing death rates. ✨With her famous nightly rounds, checking on wounded soldiers by lamplight, she earned the nickname “The Lady with the Lamp”. But her impact didn’t stop there as she revolutionized healthcare, introducing hygiene practices and establishing the first professional nursing school. Thanks to her dedication, nursing became a respected profession, and millions continue to benefit from her legacy today. 👩‍⚕️📚", color: "#F0E68C" }, // Khaki
+            "Die \"Mutti\" Kanzlerin": { text: "A scientist turned world leader, Angela Merkel made history as Germany’s first female chancellor, serving for an impressive 16 years (2005–2021). 🏛️ Nicknamed Die Mutti Kanzlerin (The Mother Chancellor), she was known for her steady leadership, pragmatism, and calm decision-making in times of crisis.⚖️<br><br>From guiding Europe through financial turmoil to leading Germany’s response to migrant crisis and COVID-19, Merkel became one of the world’s most respected leaders. 🏆Even after stepping down, her legacy of resilience and diplomacy continues to inspire.👏", color: "#87CEFA" }, // Sky Blue
+            "Sương Nguyệt Ánh": { text: "A true pioneer, Sương Nguyệt Ánh (born Nguyễn Thị Ngọc Khuê in 1864) was Vietnam’s first female newspaper editor and a passionate advocate for women’s rights! 📖 As the daughter of legendary poet Nguyễn Đình Chiểu, she grew up surrounded by literature and used her voice to inspire change. ✨In 1918, she became the editor-in-chief of Nữ Giới Chung (Women’s Bell), the first newspaper agent in Vietnam dedicated to empowering women.📰Through her work, she encouraged education, equality, and a brighter future for Vietnamese women. Even today, her legacy continues to inspire generations! 🌸", color: "#DDA0DD" }, // Plum
+            "Flower, Food & Cuddles": { text: "Treating the amazing women in your life isn’t just about grand gestures, it’s about kindness, thoughtfulness, and appreciation every day! 🌷 Flowers? Always a classic—roses for romance, lilies for admiration, or sunflowers for joy. Sweet treats like chocolates or a favorite homemade meal show you truly care. But beyond gifts, the most meaningful gestures are listening, respecting, and supporting their dreams.<br><br>💪Whether it’s a warm hug, a handwritten note, or simply being there, small acts of love make all the difference.💕So, this Women’s Day, let’s celebrate the incredible women around us with flowers, food, and all the cuddles they deserve! 🤗", color: "#FFA07A" }, // Light Salmon
+            "Embracing Women's Day": { text: "People across the world come together to celebrate International Women’s Day in unique and meaningful ways. 🎉In some countries, it’s a public holiday with parades, speeches, and cultural events. 🌸Others mark the day by giving flowers, chocolates, and heartfelt messages to the incredible women in their lives. 💌Many workplaces and schools hold discussions about gender equality raising awareness. But celebrating doesn’t have to be grand, a simple 'thank you', a thoughtful gift, or quality time with friends and loved ones is more than enough.<br><br>💕However you celebrate, the most important thing is to show appreciation, spread love, and uplift the women around you!", color: "#DAF7A6 " }, // Pale Green
+            "Celebrate With Us At VGU": { text: "💖Join us at Vietnamese-German University and the Goethe Institut as we celebrate strength, achievements, and contributions of women on this special day! Expect a day filled with joyful moments and heartfelt appreciation for the incredible women in our community. Whether it’s via sharing gratitude, enjoying meaningful activities, or simply being together, let’s make this day unforgettable.💌<br><br>🌷Happy International Women’s Day — may it be filled with love, laughter and empowerment!🎊", color: "#fff975" } // Light yellow
+        };
+
+        gridItems.forEach(item => {
+            item.addEventListener("click", function () {
+                const text = this.innerText.trim();
+                const data = contentMap[text] || { text: "No content available.", color: "#FFFFFF" };
+                popupContent.innerHTML = data.text;
+                popupBox.style.backgroundColor = data.color;
+                popupBox.style.display = "block";
+                popupOverlay.style.display = "block";
+            });
+        });
+
+        // Close popup when clicking outside
+        popupOverlay.addEventListener("click", function () {
+            popupBox.style.display = "none";
+            popupOverlay.style.display = "none";
+        });
+    })
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const logo = document.querySelector(".logo");
+
+        logo.addEventListener("click", function (event) {
+            const logoWidth = logo.offsetWidth;
+            const clickPosition = event.offsetX;
+
+            if (clickPosition < logoWidth / 2) {
+            // Clicked on the left side
+                window.open("https://vgu.edu.vn/", "_blank");
+                
+            } else {
+            // Clicked on the right side
+                window.open("https://www.goethe.de/ins/vn/vi/index.html", "_blank");
+            }
+        });
+    });
+
+</script>
+    </script>
+</body>
+</html>
